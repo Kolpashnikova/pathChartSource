@@ -73,7 +73,8 @@
             3: 'Housework', 4: 'Child Care', 5: 'Adult Care', 6: 'Work',
             7: 'Shopping', 8: 'TV Watching', 9: 'Eating', 10: 'Leisure', 11: 'Travel'};
 
-        var radius = width < 400 ? 1: 4;
+        var radius = width < 400 ? 1: 4,
+            padding = 2;
 
         // I suggest not using more demog information (for instance floating onhover information--for privacy matters), if you plan to use this code to do similar things with ATUSx. Stick with id-stripped diaries
         var data = [[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,9,3,3,11,11,11,10,10,10,11,4,4,4,4,4,4,9,9,10,10,10,10,10,10,10,10,10,10,10,10,10,11,11,11,11,9,9,9,9,9,10,10,10,10,10,10,10,10,8,8,8,8,8,8,8,8,8,8,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
@@ -898,7 +899,10 @@
             .force('charge', d3v4.forceManyBody().strength(3))
             .force('x', forceX)
             .force('y', forceY)
-            .force('collision', d3v4.forceCollide(radius).strength(1))
+            //.force('collision', d3v4.forceCollide(radius).strength(1))
+            // new collision rules
+            .force("collide", d3v4.forceCollide().radius(d => d.r + 1).iterations(3))
+            .force("charge", d3v4.forceManyBody().strength((d, i) => i ? 0 : -width * 2 / 3))
             .on('tick', ticked);
 
         var svg = d3v4.select('#pathChart')
@@ -960,7 +964,8 @@
                 });
             }
             simulation.nodes(nodes);
-            simulation.alpha(0.5).restart();
+            //speed of moving bubbles lower - slower, higher - faster
+            simulation.alpha(0.1).restart();
 
             d3v4.select("#current_time").text(formatMinutes(moves*15));
 
